@@ -27,9 +27,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app)
 
-# ===============================
-# 📁 DATABASE SETUP
-# ===============================
+
+#  DATABASE SETUP
+
 DB_PATH = 'leetcode_tracker.db'
 EXCEL_FILE = 'students.xlsx'
 
@@ -285,7 +285,7 @@ def fetch_leetcode_data(username):
         return {"error": str(e)}
 
 # ===============================
-# 🚀 API ROUTES
+#  API ROUTES
 # ===============================
 
 # @app.route('/')
@@ -624,9 +624,9 @@ def unassign_student():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ===============================
-# 🧠 INTEGRITYAI - SMART STUDENT ANALYSIS
-# ===============================
+# ======================================
+#  INTEGRITYAI - SMART STUDENT ANALYSIS
+# ======================================
 
 QUESTION_BANK = None
 
@@ -895,7 +895,7 @@ def get_acceptance_rate(roll):
 
 #############################################################
 # ===============================
-# 🔐 AUTHENTICATION ROUTES
+#  AUTHENTICATION ROUTES
 # ===============================
 
 
