@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntegrityAI | Deep Learning Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            color: #1e1b4b;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .back-btn {
+            background: white;
+            border: 1px solid #e9d5ff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            color: #6d28d9;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .back-btn:hover { background: #f3e8ff; transform: translateX(-4px); border-color: #c4b5fd; }
+        
+        .hero-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9d5ff;
+            box-shadow: 0 4px 15px rgba(109, 40, 217, 0.05);
+        }
+        .hero-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .ai-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+        }
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-top: 1rem; }
+        .stat-card {
+            background: #faf5ff;
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #e9d5ff;
+        }
+        .stat-card:hover { transform: translateY(-3px); background: #f3e8ff; box-shadow: 0 4px 12px rgba(109,40,217,0.08); }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #4c1d95; }
+        .stat-label { font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; }
+        .skill-badge { 
+            display: inline-block; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            background: #ede9fe; 
+            color: #37608a; 
+        }
+        
+        .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .insight-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem;
+            border-left: 3px solid #8b5cf6;
+            border: 1px solid #e9d5ff;
+            transition: all 0.3s ease;
+        }
+        .insight-card:hover { box-shadow: 0 4px 12px rgba(109,40,217,0.08); transform: translateY(-2px); }
+        .insight-card.warning { border-left-color: #f59e0b; }
+        .insight-card.success { border-left-color: #10b981; }
+        .insight-card.achievement { border-left-color: #eab308; }
+        .insight-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .insight-title { font-weight: 600; margin-bottom: 0.25rem; color: #1e1b4b; }
+        .insight-message { font-size: 0.8rem; color: #6b7280; }
+        
+        .topics-section, .recommendations-section, .study-plan-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9d5ff;
+        }
+        h3 { font-size: 0.9rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: #4c1d95; }
+        .topics-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .topic-chip { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; background: #f3e8ff; color: #6d28d9; }
+        .topic-chip.weak { background: #fee2e2; color: #dc2626; }
+        .topic-chip.strong { background: #d1fae5; color: #059669; }
+        
+        .topic-recommendations { margin-bottom: 1rem; padding: 0.75rem; background: #faf5ff; border-radius: 12px; border: 1px solid #e9d5ff; }
+        .topic-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding-bottom: 0.25rem; border-bottom: 1px solid #e9d5ff; }
+        .topic-name { font-weight: 600; color: #6d28d9; }
+        .problem-count { font-size: 0.7rem; color: #6b7280; }
+        .problem-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: white; border-radius: 8px; margin-bottom: 0.5rem; border: 1px solid #f3e8ff; }
+        .problem-item:hover { background: #f3e8ff; transform: translateX(4px); }
+        .problem-difficulty { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 12px; min-width: 60px; text-align: center; }
+        .problem-difficulty.easy { background: #d1fae5; color: #059669; }
+        .problem-difficulty.medium { background: #fed7aa; color: #d97706; }
+        .problem-difficulty.hard { background: #fee2e2; color: #dc2626; }
+        .problem-name { flex: 1; color: #1e1b4b; text-decoration: none; font-size: 0.85rem; }
+        .problem-name:hover { color: #6d28d9; }
+        .problem-reason { font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; margin-left: 2rem; }
+        
+        .schedule-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; border-bottom: 1px solid #e9d5ff; }
+        .schedule-day { font-weight: 600; min-width: 80px; font-size: 0.8rem; color: #4c1d95; }
+        .schedule-task { flex: 1; font-size: 0.8rem; color: #4b5563; }
+        
+        .empty-state { text-align: center; padding: 3rem; }
+        .empty-state i { font-size: 3rem; color: #8b5cf6; opacity: 0.5; margin-bottom: 1rem; }
+        .loading-container { display: flex; justify-content: center; align-items: center; min-height: 400px; }
+        .spinner { width: 50px; height: 50px; border: 3px solid #e9d5ff; border-top-color: #8b5cf6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .mastery-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .mastery-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Modal Styles - Light Theme */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 24px;
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            border: 1px solid #e9d5ff;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+            box-shadow: 0 20px 35px -10px rgba(109,40,217,0.2);
+        }
+        .modal-container::-webkit-scrollbar { width: 4px; }
+        .modal-container::-webkit-scrollbar-track { background: #f3e8ff; }
+        .modal-container::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 4px; }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f3e8ff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            color: #6d28d9;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .modal-close:hover { background: #fee2e2; color: #dc2626; transform: scale(1.05); }
+        .modal-title {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            padding-right: 2rem;
+            color: #4c1d95;
+        }
+        .modal-chart-container { position: relative; height: 250px; width: 100%; margin: 0.5rem 0; }
+        .modal-stats {
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #faf5ff;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+        .modal-footer { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+        .modal-footer button {
+            background: #f3e8ff;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            color: #6d28d9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .modal-footer button:hover { background: #8b5cf6; color: white; }
+        
+        @media (max-width: 640px) {
+            .container { padding: 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal-container { padding: 1rem; }
+            .modal-chart-container { height: 200px; }
+            .modal-title { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <div id="integrityContent"><div class="loading-container"><div class="spinner"></div><p style="margin-left:1rem; color:#6b7280;">Loading IntegrityAI analysis...</p></div></div>
+    </div>
+
+    <!-- Mastery Graph Modal -->
+    <div id="masteryModal" class="modal-overlay">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeMasteryModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h3 class="modal-title">
+                <i class="fas fa-chart-line" style="color: #10b981;"></i> 
+                Acceptance Rate by Difficulty
+            </h3>
+            
+            <div class="modal-chart-container">
+                <canvas id="masteryAcceptanceChart"></canvas>
+            </div>
+            
+            <div id="masteryOverallRate" class="modal-stats">
+                Loading data...
+            </div>
+            
+            <div class="modal-footer">
+                <button onclick="closeMasteryModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function waitForChart(callback) {
+            if (typeof Chart !== 'undefined') {
+                callback();
+            } else {
+                setTimeout(function() { waitForChart(callback); }, 100);
+            }
+        }
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const roll = urlParams.get('roll');
+        let masteryChart = null;
+        
+        if (!roll) {
+            document.getElementById('integrityContent').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>No Student Selected</h3><p>Please go back and select a student first.</p><a href="/dashboard" class="back-btn" style="display:inline-flex; margin-top:1rem;">Go to Dashboard</a></div>`;
+        } else {
+            loadIntegrityAnalysis(roll);
+        }
+        
+        async function loadIntegrityAnalysis(roll) {
+            try {
+                const response = await fetch(`/api/integrity-ai/${encodeURIComponent(roll)}`);
+                const data = await response.json();
+                if (data.error) {
+                    document.getElementById('integrityContent').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Error</h3><p>${data.error}</p></div>`;
+                } else {
+                    displayDashboard(data);
+                }
+            } catch (error) {
+                document.getElementById('integrityContent').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Connection Error</h3><p>Unable to load analysis. Please try again.</p></div>`;
+            }
+        }
+        
+        function displayDashboard(data) {
+            const weakHtml = (data.topics.weak || []).map(t => `<span class="topic-chip weak">⚠️ ${escapeHtml(t)}</span>`).join('');
+            const strongHtml = (data.topics.strong || []).map(t => `<span class="topic-chip strong">✅ ${escapeHtml(t)}</span>`).join('');
+            
+            let recHtml = '';
+            for (const [topic, problems] of Object.entries(data.recommendations)) {
+                if (problems.length) {
+                    recHtml += `<div class="topic-recommendations">
+                        <div class="topic-header"><span class="topic-name">📚 ${escapeHtml(topic)}</span><span class="problem-count">${problems.length} problems</span></div>
+                        ${problems.map(p => `<div class="problem-item"><span class="problem-difficulty ${p.difficulty.toLowerCase()}">${p.difficulty}</span><a href="${p.url}" target="_blank" class="problem-name">${p.id}. ${escapeHtml(p.name)}</a></div><div class="problem-reason">💡 ${escapeHtml(p.reason)}</div>`).join('')}
+                    </div>`;
+                }
+            }
+            
+            let scheduleHtml = '';
+            for (const item of data.study_plan.weekly_schedule) {
+                scheduleHtml += `<div class="schedule-item"><div class="schedule-day">${item.day}</div><div class="schedule-task">${item.task} (${item.problems} problems)</div></div>`;
+            }
+            
+            let insightsHtml = '';
+            for (const insight of data.insights) {
+                insightsHtml += `<div class="insight-card ${insight.type}"><div class="insight-icon">${insight.icon}</div><div class="insight-title">${escapeHtml(insight.title)}</div><div class="insight-message">${escapeHtml(insight.message)}</div></div>`;
+            }
+            
+            document.getElementById('integrityContent').innerHTML = `
+                <div class="hero-section">
+                    <div class="hero-header">
+                        <div class="ai-icon"><i class="fas fa-brain"></i></div>
+                        <div><h2 style="color:#4c1d95;">IntegrityAI Deep Analysis</h2><p style="color:#6b7280;">Personalized insights for <strong style="color:#6d28d9;">${escapeHtml(data.student_name)}</strong> (${escapeHtml(data.roll)})</p></div>
+                        <div class="skill-badge" style="background:${data.stats.level_color}20; color:${data.stats.level_color}">${data.stats.level_icon} ${data.stats.skill_level}</div>
+                        <button id="masteryBtn" class="mastery-btn">
+                            <i class="fas fa-chart-line"></i> View Mastery Graph
+                        </button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-value">${data.stats.total}</div><div class="stat-label">Total Solved</div></div>
+                        <div class="stat-card"><div class="stat-value">${data.stats.easy}</div><div class="stat-label">Easy</div></div>
+                        <div class="stat-card"><div class="stat-value">${data.stats.medium}</div><div class="stat-label">Medium</div></div>
+                        <div class="stat-card"><div class="stat-value">${data.stats.hard}</div><div class="stat-label">Hard</div></div>
+                        <div class="stat-card"><div class="stat-value">${data.stats.mastery_percentage}%</div><div class="stat-label">Mastery</div></div>
+                    </div>
+                </div>
+                <div class="insights-grid">${insightsHtml}</div>
+                <div class="topics-section"><h3><i class="fas fa-exclamation-triangle"></i> Areas for Improvement</h3><div class="topics-chips">${weakHtml || '<span class="topic-chip">None identified</span>'}</div>${strongHtml ? `<h3 style="margin-top:1rem"><i class="fas fa-star"></i> Your Strengths</h3><div class="topics-chips">${strongHtml}</div>` : ''}</div>
+                <div class="recommendations-section"><h3><i class="fas fa-lightbulb"></i> Smart Recommendations (${data.total_recommendations} problems)</h3>${recHtml || '<div class="empty-state">No recommendations available</div>'}</div>
+                <div class="study-plan-section"><h3><i class="fas fa-calendar-week"></i> Personalized Study Plan</h3><div class="weekly-schedule"><div class="schedule-item"><div class="schedule-day">Daily Goal</div><div class="schedule-task">${data.study_plan.daily_goal}</div></div><div class="schedule-item"><div class="schedule-day">Weekly Target</div><div class="schedule-task">${data.study_plan.weekly_target}</div></div><div class="schedule-item"><div class="schedule-day">Focus Area</div><div class="schedule-task">${data.study_plan.focus_area}</div></div>${scheduleHtml}</div></div>
+            `;
+            
+            const masteryBtn = document.getElementById('masteryBtn');
+            if (masteryBtn) {
+                masteryBtn.onclick = () => openMasteryModal(data.roll);
+            }
+        }
+        
+        async function openMasteryModal(roll) {
+            const modal = document.getElementById('masteryModal');
+            modal.style.display = 'flex';
+            await loadMasteryGraph(roll);
+        }
+        
+        function closeMasteryModal() {
+            const modal = document.getElementById('masteryModal');
+            modal.style.display = 'none';
+            if (masteryChart) {
+                masteryChart.destroy();
+                masteryChart = null;
+            }
+        }
+        
+        async function loadMasteryGraph(roll) {
+            const overallDiv = document.getElementById('masteryOverallRate');
+            overallDiv.innerHTML = 'Fetching acceptance data...';
+            
+            try {
+                const apiUrl = `/api/student/acceptance/${encodeURIComponent(roll)}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if (data.acceptance_data && data.acceptance_data.length > 0) {
+                    const difficulties = data.acceptance_data.map(d => d.difficulty);
+                    const rates = data.acceptance_data.map(d => d.acceptance_rate);
+                    const solved = data.acceptance_data.map(d => d.solved);
+                    const accepted = data.acceptance_data.map(d => d.accepted_submissions);
+                    const total = data.acceptance_data.map(d => d.total_submissions);
+                    
+                    overallDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 0.5rem;">
+                            <span style="background: #d1fae5; padding: 0.25rem 0.75rem; border-radius: 20px; color: #059669;">
+                                🟢 Easy: ${rates[0] || 0}% (${accepted[0] || 0}/${total[0] || 0}) | Solved: ${solved[0] || 0}
+                            </span>
+                            <span style="background: #fed7aa; padding: 0.25rem 0.75rem; border-radius: 20px; color: #d97706;">
+                                🟠 Medium: ${rates[1] || 0}% (${accepted[1] || 0}/${total[1] || 0}) | Solved: ${solved[1] || 0}
+                            </span>
+                            <span style="background: #fee2e2; padding: 0.25rem 0.75rem; border-radius: 20px; color: #dc2626;">
+                                🔴 Hard: ${rates[2] || 0}% (${accepted[2] || 0}/${total[2] || 0}) | Solved: ${solved[2] || 0}
+                            </span>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            📊 Overall Acceptance Rate: <strong style="color: #6d28d9;">${data.overall_rate}%</strong>
+                            | ✅ Total Solved: <strong style="color: #6d28d9;">${solved.reduce((a,b) => a + b, 0)}</strong>
+                            | 📝 Total Submissions: <strong>${total.reduce((a,b) => a + b, 0)}</strong>
+                        </div>
+                    `;
+                    
+                    waitForChart(function() {
+                        const ctx = document.getElementById('masteryAcceptanceChart').getContext('2d');
+                        
+                        if (masteryChart) {
+                            masteryChart.destroy();
+                        }
+                        
+                        masteryChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: difficulties,
+                                datasets: [{
+                                    label: 'Acceptance Rate (%)',
+                                    data: rates,
+                                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                                    borderRadius: 8,
+                                    borderWidth: 0,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: { color: '#4b5563', font: { size: 11 } }
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                const idx = context.dataIndex;
+                                                return [
+                                                    `${context.dataset.label}: ${context.raw}%`,
+                                                    `Accepted: ${accepted[idx]}/${total[idx]}`,
+                                                    `Unique Solved: ${solved[idx]}`
+                                                ];
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        title: { display: true, text: 'Acceptance Rate (%)', color: '#6b7280' },
+                                        min: 0,
+                                        max: 100,
+                                        grid: { color: '#e5e7eb' },
+                                        ticks: { color: '#4b5563', callback: function(value) { return value + '%'; } }
+                                    },
+                                    x: {
+                                        ticks: { color: '#4b5563', font: { weight: 'bold', size: 11 } },
+                                        grid: { display: false }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                } else {
+                    overallDiv.innerHTML = '<span style="color: #dc2626;">No acceptance data available for this student</span>';
+                }
+            } catch (error) {
+                console.error('Error loading mastery graph:', error);
+                overallDiv.innerHTML = '<span style="color: #dc2626;">Error loading acceptance data: ' + error.message + '</span>';
+            }
+        }
+        
+        function escapeHtml(str) { 
+            if (!str) return ''; 
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); 
+        }
+    </script>
+</body>
+</html>
